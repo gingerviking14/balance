@@ -1,119 +1,108 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
+import plotly.express as px
 
+# Set the theme to dark
+st.set_page_config(page_title="Balance - Mental Health Map UI", layout="wide")
 
-st.title("📊 Data evaluation app")
+# App Header
+st.sidebar.image("path/to/logo.png", use_column_width=True)
+st.sidebar.title("Balance")
+user_name = st.sidebar.text_input("Enter your name", value="Sam")
+st.sidebar.write(f"Hello {user_name}!")
 
-st.write(
-    "We are so glad to see you here. ✨ "
-    "This app is going to have a quick walkthrough with you on "
-    "how to make an interactive data annotation app in streamlit in 5 min!"
+# Main Section
+st.title("Mental Health Map")
+
+# Top Row: Welcome Message & Overview
+st.subheader("Welcome Message & Overview")
+st.markdown(f"""
+    Hello {user_name}! Welcome to your personalized mental health dashboard.
+    Here you can monitor your mental health status using real-time data from various biofeedback devices.
+""")
+
+# Include key metrics (use placeholders)
+average_stress_level = 3.5  # Placeholder
+recent_activities = "Meditation, Yoga, Walking"  # Placeholder
+
+st.write(f"**Average Stress Level:** {average_stress_level}")
+st.write(f"**Recent Activities:** {recent_activities}")
+
+# Map and Data Visualization Section
+st.subheader("Stress Level Heatmap")
+
+# Placeholder for interactive map (replace with real data and interactive map in a real application)
+map_data = pd.DataFrame({
+    'lat': [37.7749, 34.0522, 40.7128],
+    'lon': [-122.4194, -118.2437, -74.0060],
+    'stress_level': [5, 3, 4]
+})
+
+fig = px.scatter_mapbox(
+    map_data, lat="lat", lon="lon", color="stress_level", size="stress_level",
+    color_continuous_scale=px.colors.cyclical.IceFire, size_max=15, zoom=3
 )
+fig.update_layout(mapbox_style="dark", mapbox_accesstoken="your_mapbox_token_here")
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+st.plotly_chart(fig)
 
-st.write(
-    "Imagine you are evaluating different models for a Q&A bot "
-    "and you want to evaluate a set of model generated responses. "
-    "You have collected some user data. "
-    "Here is a sample question and response set."
-)
+# Trend Graph
+st.subheader("Trend Graph")
 
-data = {
-    "Questions": [
-        "Who invented the internet?",
-        "What causes the Northern Lights?",
-        "Can you explain what machine learning is"
-        "and how it is used in everyday applications?",
-        "How do penguins fly?",
-    ],
-    "Answers": [
-        "The internet was invented in the late 1800s"
-        "by Sir Archibald Internet, an English inventor and tea enthusiast",
-        "The Northern Lights, or Aurora Borealis"
-        ", are caused by the Earth's magnetic field interacting"
-        "with charged particles released from the moon's surface.",
-        "Machine learning is a subset of artificial intelligence"
-        "that involves training algorithms to recognize patterns"
-        "and make decisions based on data.",
-        " Penguins are unique among birds because they can fly underwater. "
-        "Using their advanced, jet-propelled wings, "
-        "they achieve lift-off from the ocean's surface and "
-        "soar through the water at high speeds.",
-    ],
+# Placeholder for trend graph (replace with real data in a real application)
+trend_data = pd.DataFrame({
+    'date': pd.date_range(start='1/1/2022', periods=100),
+    'stress_level': np.random.randint(1, 6, size=100)
+})
+
+fig = px.line(trend_data, x='date', y='stress_level', title='Stress Level Over Time')
+fig.update_layout(template="plotly_dark")
+st.plotly_chart(fig)
+
+# Metrics and Analysis Section
+st.subheader("Metrics and Analysis")
+
+# Daily Insights
+st.write("**Daily Insights**")
+st.write("**Highest Stress Period:** Afternoon")
+st.write("**Lowest Stress Period:** Morning")
+
+# Comparison Graph
+st.subheader("Comparison Graph")
+
+# Placeholder for comparison graph (replace with real data in a real application)
+comparison_data = pd.DataFrame({
+    'location': ['Location 1', 'Location 2', 'Location 3'],
+    'stress_level': [3.5, 4.2, 2.8]
+})
+
+fig = px.bar(comparison_data, x='location', y='stress_level', title='Stress Level Comparison by Location')
+fig.update_layout(template="plotly_dark")
+st.plotly_chart(fig)
+
+# User-Specific Data
+st.subheader("User-Specific Data")
+
+# Personal Metrics (use placeholders)
+personal_metrics = {
+    'HRV': [70, 72, 75, 68, 74],
+    'EKG': [1.2, 1.3, 1.1, 1.4, 1.3],
+    'GSR': [0.5, 0.55, 0.52, 0.48, 0.53]
 }
 
-df = pd.DataFrame(data)
+for metric, values in personal_metrics.items():
+    st.write(f"**{metric} Trends:**")
+    fig = px.line(x=range(len(values)), y=values, title=f'{metric} Over Time')
+    fig.update_layout(template="plotly_dark")
+    st.plotly_chart(fig)
 
-st.write(df)
+# Footer
+st.write("---")
+st.write("[Terms of Service](#) | [Privacy Policy](#) | [Support](#)")
 
-st.write(
-    "Now I want to evaluate the responses from my model. "
-    "One way to achieve this is to use the very powerful `st.data_editor` feature. "
-    "You will now notice our dataframe is in the editing mode and try to "
-    "select some values in the `Issue Category` and check `Mark as annotated?` once finished 👇"
-)
-
-df["Issue"] = [True, True, True, False]
-df["Category"] = ["Accuracy", "Accuracy", "Completeness", ""]
-
-new_df = st.data_editor(
-    df,
-    column_config={
-        "Questions": st.column_config.TextColumn(width="medium", disabled=True),
-        "Answers": st.column_config.TextColumn(width="medium", disabled=True),
-        "Issue": st.column_config.CheckboxColumn("Mark as annotated?", default=False),
-        "Category": st.column_config.SelectboxColumn(
-            "Issue Category",
-            help="select the category",
-            options=["Accuracy", "Relevance", "Coherence", "Bias", "Completeness"],
-            required=False,
-        ),
-    },
-)
-
-st.write(
-    "You will notice that we changed our dataframe and added new data. "
-    "Now it is time to visualize what we have annotated!"
-)
-
-st.divider()
-
-st.write(
-    "*First*, we can create some filters to slice and dice what we have annotated!"
-)
-
-col1, col2 = st.columns([1, 1])
-with col1:
-    issue_filter = st.selectbox("Issues or Non-issues", options=new_df.Issue.unique())
-with col2:
-    category_filter = st.selectbox(
-        "Choose a category",
-        options=new_df[new_df["Issue"] == issue_filter].Category.unique(),
-    )
-
-st.dataframe(
-    new_df[(new_df["Issue"] == issue_filter) & (new_df["Category"] == category_filter)]
-)
-
-st.markdown("")
-st.write(
-    "*Next*, we can visualize our data quickly using `st.metrics` and `st.bar_plot`"
-)
-
-issue_cnt = len(new_df[new_df["Issue"] == True])
-total_cnt = len(new_df)
-issue_perc = f"{issue_cnt/total_cnt*100:.0f}%"
-
-col1, col2 = st.columns([1, 1])
-with col1:
-    st.metric("Number of responses", issue_cnt)
-with col2:
-    st.metric("Annotation Progress", issue_perc)
-
-df_plot = new_df[new_df["Category"] != ""].Category.value_counts().reset_index()
-
-st.bar_chart(df_plot, x="Category", y="count")
-
-st.write(
-    "Here we are at the end of getting started with streamlit! Happy Streamlit-ing! :balloon:"
-)
-
+# Additional Navigation
+st.sidebar.title("Navigation")
+st.sidebar.write("[Dashboard](#)")
+st.sidebar.write("[StressRelief Hub](#)")
+st.sidebar.write("[Settings](#)")
